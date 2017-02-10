@@ -1,11 +1,15 @@
 <html>
 <head>
-    <meta charset="UTF-8">
     <title>To_Do lists</title>
 </head>
 <body>
-    <h1>Your To-Do lists</h1>
-<input id="id_new_item" placeholder="Enter a to-do item"/>
-<table id="id_list_table"></table>
+<h1>Your To-Do lists</h1>
+<form method="post">
+    {% csrf_token %}
+    <input name="item_text" id="id_new_item" placeholder="Enter a to-do item"/>
+</form>
+<table id="id_list_table">
+        <tr><td>{{ new_item_text }}</td></tr>
+</table>
 </body>
 </html>
