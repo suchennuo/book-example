@@ -3,9 +3,9 @@ from selenium import webdriver
 import unittest
 from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Chrome()
@@ -19,6 +19,15 @@ class NewVisitorTest(LiveServerTestCase):
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
 
+    def test_layout_and_styling(self):
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 786)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=5
+        )
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         self.browser.get(self.live_server_url)
@@ -74,19 +83,9 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
 
-        self.fail('Finish the test!')
+        # self.fail('Finish the test!')
 
-    # def test_layout_and_styling(self):
-    #     self.browser.get(self.live_server_url)
-    #     self.browser.set_window_size(1024, 786)
-    #
-    #     inputbox = self.browser.find_element_by_id('id_new_item')
-    #     inputbox.send_keys('testing\n')
-    #     self.assertAlmostEqual(
-    #         inputbox.location['x'] + inputbox.size['width'] / 2,
-    #         512,
-    #         delta=5
-    #     )
+
 #
 # if __name__ == '__main__':
 #     unittest.main(warnings='ignore')
