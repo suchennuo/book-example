@@ -2,9 +2,10 @@
 from selenium import webdriver
 import unittest
 from selenium.webdriver.common.keys import Keys
+from django.test import LiveServerTestCase
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Chrome()
@@ -20,7 +21,7 @@ class NewVisitorTest(unittest.TestCase):
 
 
     def test_can_start_a_list_and_retrieve_it_later(self):
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
         self.assertIn('To_Do list', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         #find_element_by_tag_name
@@ -36,25 +37,17 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys('Buy peacock feathers')
         #send_keys ， selenium 在输入框中输入内容的方法
         inputbox.send_keys(Keys.ENTER)
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
 
-        # inputbox = self.browser.find_element_by_id('id_new_item')
-        # inputbox.send_keys('Use peacok feather t0 make a fly.')
-        # inputbox.send_keys(Keys.ENTER)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacok feather to make a fly.')
+        inputbox.send_keys(Keys.ENTER)
 
-        # table = self.browser.find_element_by_id('id_list_table')
-        # #find_element_by_id
-        #
-        # rows = table.find_elements_by_tag_name('tr')
-        # #find_elements_by_tag_name
-        # self.assertTrue(
-        #     any(row.text == '1: Buy peacock feathers' for row in rows),
-        #     "New to-do item did not appear in table -- its text was:\n%s" % (table.text)
-        # )
 
-        self.check_for_row_in_list_table('Buy peacock feathers')
-        # self.check_for_row_in_list_table('Use peacok feather t0 make a fly.')
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
+        self.check_for_row_in_list_table('2: Use peacok feather to make a fly.')
 
         self.fail('Finish the test!')
-
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+#
+# if __name__ == '__main__':
+#     unittest.main(warnings='ignore')
