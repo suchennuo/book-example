@@ -67,7 +67,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox.send_keys(Keys.ENTER)
         job_list_url = self.browser.current_url
         self.assertRegex(job_list_url, '/lists/.+')
-        self.assertEqual(job_list_url, edith_list_url)
+        self.assertNotEqual(job_list_url, edith_list_url)
 
         # 这个页面还是没有 aya 的清单
         page_text = self.browser.find_element_by_tag_name('body').text
