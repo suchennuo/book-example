@@ -75,6 +75,18 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertIn('Buy milk', page_text)
 
         self.fail('Finish the test!')
+
+    # def test_layout_and_styling(self):
+    #     self.browser.get(self.live_server_url)
+    #     self.browser.set_window_size(1024, 786)
+    #
+    #     inputbox = self.browser.find_element_by_id('id_new_item')
+    #     inputbox.send_keys('testing\n')
+    #     self.assertAlmostEqual(
+    #         inputbox.location['x'] + inputbox.size['width'] / 2,
+    #         512,
+    #         delta=5
+    #     )
 #
 # if __name__ == '__main__':
 #     unittest.main(warnings='ignore')

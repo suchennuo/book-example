@@ -176,3 +176,4 @@ class NewItemTest(TestCase):
         response = self.client.get('/lists/%d/' % (correct_list.id,))
         self.assertEqual(response.context['list'], correct_list)
 
+
