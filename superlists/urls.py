@@ -18,9 +18,11 @@ from django.contrib import admin
 from lists.views import home_page
 from lists.views import view_list
 from lists.views import new_list
+from lists.views import add_item
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', home_page),
-    url(r'^lists/the-only-list-in-the-world/$', view_list),
+    url(r'^lists/(\d+)/$', view_list),
     url(r'^lists/new$', new_list),
+    url(r'^lists/(\d+)/add_item$', add_item),
 ]
