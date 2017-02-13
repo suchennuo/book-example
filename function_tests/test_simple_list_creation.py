@@ -4,47 +4,12 @@ import unittest
 from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from unittest import skip
+from .base import FunctionTest
 
 import sys
 
-class NewVisitorTest(StaticLiveServerTestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        for arg in sys.argv:
-            if 'liveserver' in arg:
-                cls.server_ul = 'http://' + arg.split('=')[1]
-                return
-        super().setUpClass()
-        cls.server_ul = cls.live_server_url
-
-    @classmethod
-    def tearDownClass(cls):
-        if cls.server_ul == cls.live_server_url:
-            super().tearDownClass()
-
-
-    def setUp(self):
-        self.browser = webdriver.Chrome()
-        self.browser.implicitly_wait(3) #隐式等待
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows])
-
-    def test_layout_and_styling(self):
-        self.browser.get(self.server_ul)
-        self.browser.set_window_size(1024, 786)
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=5
-        )
+class NewVisitorTest(FunctionTest):
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         self.browser.get(self.server_ul)
@@ -82,7 +47,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.browser = webdriver.Chrome()
 
         # Job 访问首页， 看不到 Aya 的清单内容
-        self.browser.get(self.server_url)
+        self.browser.get(self.live_server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
@@ -101,8 +66,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertIn('Buy milk', page_text)
 
         # self.fail('Finish the test!')
-
-
-#
-# if __name__ == '__main__':
-#     unittest.main(warnings='ignore')
