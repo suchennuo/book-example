@@ -18,9 +18,7 @@ from django.contrib import admin
 from lists.views import home_page
 from lists.views import view_list
 from lists.views import new_list
-from lists.views import add_item
 urlpatterns = [
     url(r'^(\d+)/$', view_list),
     url(r'^new$', new_list),
-    url(r'^(\d+)/add_item$', add_item),
 ]
