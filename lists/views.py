@@ -9,7 +9,7 @@ from lists.forms import ItemForm
 # Create your views here.
 def home_page(request):
     # if request.method == 'POST':
-    #     new_item_text = request.POST['item_text']
+    #     new_item_text = request.POST['text']
     #     Item.objects.create(text=new_item_text)
     #     return redirect('/lists/the-only-list-in-the-world/')
 
@@ -20,11 +20,11 @@ def home_page(request):
     #     new_item_text = ''
 
     # item = Item();
-    # item.text = request.POST.get('item_text', '')
+    # item.text = request.POST.get('text', '')
     # item.save()
 
     # return render(request, 'home.html',{
-    #     # 'new_item_text':request.POST.get('item_text', ''),
+    #     # 'new_item_text':request.POST.get('text', ''),
     #     'new_item_text' : new_item_text,
     # })
 
@@ -36,7 +36,7 @@ def view_list(request, list_id):
 
     if request.method == 'POST':
         try:
-            item = Item.objects.create(text=request.POST['item_text'], list=list_)
+            item = Item.objects.create(text=request.POST['text'], list=list_)
             item.full_clean()
             item.save()
             return redirect(list_)
@@ -47,7 +47,7 @@ def view_list(request, list_id):
 
 def new_list(request):
     list_ = List.objects.create()
-    item = Item.objects.create(text=request.POST['item_text'], list=list_)
+    item = Item.objects.create(text=request.POST['text'], list=list_)
     try:
         item.full_clean()
         item.save()
