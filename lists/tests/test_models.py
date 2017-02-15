@@ -7,7 +7,7 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 from django.db import models
 from django.core.exceptions import ValidationError
-
+from unittest import skip
 from lists.views import home_page
 from lists.models import Item, List
 
@@ -57,3 +57,8 @@ class ListAndItemModelTest(TestCase):
             # Django 不会运行全部约束，在数据库中实现的约束， 保存数据时都会抛出异常
             # 但 SQLite 不支持文本字段上的强制控制约束，所以save() 方法通过了验证
             # Django 提供了一个用于全部验证的方法 full_clean()
+
+
+    def test_get_absolute_url(self):
+        list_ = List.objects.create()
+        self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % (list_.id))
