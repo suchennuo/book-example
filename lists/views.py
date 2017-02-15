@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from lists.models import Item, List
 from django.core.exceptions import ValidationError
 
+from lists.forms import ItemForm
+
 
 # Create your views here.
 def home_page(request):
@@ -13,7 +15,7 @@ def home_page(request):
 
     # items = Item.objects.all()
     # return render(request, 'home.html', {'items':items})
-    return render(request, 'home.html')
+    return render(request, 'home.html', {'form':ItemForm()})
     # else:
     #     new_item_text = ''
 
