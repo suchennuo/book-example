@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+
 from lists.models import Item
 
 # class ItemForm(forms.Form):
@@ -41,9 +43,9 @@ field class.
 """
 
 EMPTY_LIST_ERROR = "You can't have an empty list item"
+DUPLICATE_ITEM_ERROR = "You've already got this in your list"
 
 class ItemForm(forms.models.ModelForm):
-
 
     def save(self, for_list):
         self.instance.list = for_list
@@ -63,4 +65,35 @@ class ItemForm(forms.models.ModelForm):
             'text': {'required': EMPTY_LIST_ERROR}
         }
 
+class ExistingListItemForm(ItemForm):
 
+    def save(self):
+        return forms.models.ModelForm.save(self)
+
+
+    def __init__(self, for_list, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.list = for_list
+
+    """
+    需要了解一下 django 内部机理 对模型验证 对表单验证
+    Django 在 form 和 model 中都会调用 validation_unique()， 借助 instance 属性
+    (form.instance = model) 在 form 的
+    validation_unique() 中调用 model 的 validation_unique()
+    why:
+        必须调用 model 的 validation_unique() ?
+    because:
+        是否出现 IntegrityError 完全取决于完整性约束是否由数据库执行。
+    Django 想把 models.py 中 unique_together 除了作为应用层约束之外，还想把它加入数据库中
+    我们希望在尝试保存数据之前调用 is_valid, 注意到重复。而不是直到数据库执行层才给出警告（integrityError)
+    解决步骤：
+    1. form 首先要知道 哪个清单 以及 待办事项文本。 参考 ItemForm 的流程
+    2. form 层验证
+    3.
+    """
+    def validate_unique(self):
+        try:
+            self.instance.validate_unique()
+        except ValidationError as e:
+            e.error_dict = {'text':[DUPLICATE_ITEM_ERROR]}
+            self._update_errors(e)
