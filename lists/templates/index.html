@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+</head>
+<body>
+<h2> WELCOME </h2>
+       {% if request.user.is_authenticated %}
+            <p>{{request.user}} login success </p>
+           <a href="/wanderlist/">Enjoy</a>
+           </br>
+           <a href="/blog/">Blog</a>
+           </br>
+           <a href="/logout/">Logout</a>
+        {% else %}
+           <p>login failure <a href="/login/">登入</a></p>
+        {% endif %}
+        </br>
+        <img src="../static/alipay.png" >
+</body>
+</html>

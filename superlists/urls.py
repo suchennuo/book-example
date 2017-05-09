@@ -18,11 +18,21 @@ from django.contrib import admin
 from lists.views import home_page
 from lists.views import view_list
 from lists.views import new_list
+from lists.views import register_view
+from lists.views import register_test, active_user, login, index, logout, blog
 
 app_name='lists'
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^$', home_page),
+    # url(r'^admin/', admin.site.urls),
+    url(r'^wanderlist/', home_page),
+    url(r'^blog/', blog),
     url(r'^lists/', include('lists.urls', namespace="lists")),
+    url(r'^register/', register_test),
+    url(r'^activate/(?P<token>\w+.[-_\w]*\w+.[-_\w]*\w+)/$', active_user),
+    url(r'^$', login),
+    url(r'^index/', index),
+    url(r'^logout/', logout)
+    # 参数 token 通过正则匹配传到 active_user(request, token) 中
+
 ]

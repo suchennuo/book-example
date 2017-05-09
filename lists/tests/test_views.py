@@ -10,11 +10,12 @@ from django.utils.html import escape
 
 from unittest import skip
 
-from lists.views import home_page
-from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_LIST_ERROR, DUPLICATE_ITEM_ERROR, ExistingListItemForm
+from lists.views import home_page, register_view
+from lists.models import Item, List, User
+from lists.forms import ItemForm, RegisterForm, EMPTY_LIST_ERROR, DUPLICATE_ITEM_ERROR, ExistingListItemForm
 
 import sys
+
 
 class HomePageTest(TestCase):
     maxDiff = None
@@ -70,6 +71,11 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         self.assertIsInstance(response.context['form'], ItemForm)
 
+# class RegisterPageTest(TestCase):
+#
+#     def test_uses_register_template(self):
+#         response = self.client.get('/')
+#         self.assertTemplateUsed(response, 'register.html')
 
 class ListViewTest(TestCase):
 
