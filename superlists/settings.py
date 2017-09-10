@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'lists',
+    'accounts',
+]
+
+AUTH_USER_MODEL = 'accounts.ListUser'
+AUTHENTICATION_BACKENDS = [
+    'accounts.authentication.PasswordlessAuthenticationBackend',
 ]
 
 MIDDLEWARE = [
@@ -115,6 +121,31 @@ USE_L10N = True
 
 USE_TZ = True
 
+#发送邮件配置
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_HOST_USER = '550906133@qq.com'
+EMAIL_HOST_PASSWORD = 'kekhkozpgsjrbcfc' # smtp 授权码
+EMAIL_PORT = 25
+EMAIL_USE_TLS = True
+
+# Django doesn't send all exceptions to the terminal by default.
+# Make it do so with a variable called LOGGING
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+        },
+    },
+    'root': {'level': 'INFO'},
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
