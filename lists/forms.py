@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 
 from lists.models import Item
 
+from django.contrib.auth.models import User
+
 # class ItemForm(forms.Form):
 #     item_text = forms.CharField(
 #         widget=forms.fields.TextInput(attrs={
@@ -45,8 +47,8 @@ field class.
 EMPTY_LIST_ERROR = "You can't have an empty list item"
 DUPLICATE_ITEM_ERROR = "You've already got this in your list"
 
-class ItemForm(forms.models.ModelForm):
 
+class ItemForm(forms.models.ModelForm):
     def save(self, for_list):
         self.instance.list = for_list
         return super().save()
@@ -54,7 +56,7 @@ class ItemForm(forms.models.ModelForm):
     class Meta:
         model = Item
         fields = ('text',)
-        widgets = { # !!! ModelForm 提供 widgets 参数
+        widgets = {  # !!! ModelForm 提供 widgets 参数
 
             'text': forms.fields.TextInput(attrs={
                 'placeholder': 'Enter a to-do item',
@@ -65,11 +67,10 @@ class ItemForm(forms.models.ModelForm):
             'text': {'required': EMPTY_LIST_ERROR}
         }
 
-class ExistingListItemForm(ItemForm):
 
+class ExistingListItemForm(ItemForm):
     def save(self):
         return forms.models.ModelForm.save(self)
-
 
     def __init__(self, for_list, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -91,9 +92,83 @@ class ExistingListItemForm(ItemForm):
     2. form 层验证
     3.
     """
+
     def validate_unique(self):
         try:
             self.instance.validate_unique()
         except ValidationError as e:
-            e.error_dict = {'text':[DUPLICATE_ITEM_ERROR]}
+            e.error_dict = {'text': [DUPLICATE_ITEM_ERROR]}
             self._update_errors(e)
+
+
+class RegisterForm(forms.models.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'email',)
+        widgets = {  # !!! ModelForm 提供 widgets 参数
+
+            'username': forms.fields.TextInput(attrs={
+                'placeholder': 'Username',
+                'class': 'form-control input-lg',
+            }),
+
+            'password': forms.fields.TextInput(attrs={
+                'placeholder': 'Password',
+                'class': 'form-control input-lg',
+            }),
+
+            'email': forms.fields.TextInput(attrs={
+                'placeholder': 'Email',
+                'class': 'form-control input-lg',
+            }),
+        }
+
+        error_messages = {
+            'text': {'required': EMPTY_LIST_ERROR}
+        }
+
+
+class LoginForm(forms.models.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+        # widgets = {  # !!! ModelForm 提供 widgets 参数
+        #
+        #     'username': forms.fields.TextInput(attrs={
+        #         'placeholder': 'Username',
+        #         'class': 'form-control input-lg',
+        #     }),
+        #
+        #     'password': forms.fields.TextInput(attrs={
+        #         'placeholder': 'Password',
+        #         'class': 'form-control input-lg',
+        #     }),
+        #
+        # }
+        #
+        # error_messages = {
+        #     'text': {'required': EMPTY_LIST_ERROR}
+        # }
+
+
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=100)
+    email = forms.EmailField(required=False, label='Your e-mail address')
+    message = forms.CharField(widget=forms.Textarea)
+
+    # def clean_message(self):
+    #     message = self.cleaned_data['message']
+    #     num_words = len(message.split())
+    #     if num_words < 4:
+    #         raise forms.ValidationError("专业点可不可以~")
+    #     return message
+
+
+class RegisterTestForm(forms.models.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email']
+
+        # username = forms.CharField()
+        # password = forms.CharField()
+        # email = forms.EmailField()

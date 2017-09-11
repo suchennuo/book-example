@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block header_text %}Register{% endblock %}
+{% block form_action %}{% url 'lists:register_view' %}{% endblock %}
+{% block form_input %}
+    {{ form.username }}
+    {{ form.password }}
+    {{ form.email }}
+
+    <div class="button">
+    <br>
+        <input class="submitform" type="submit" name="submitform" value="SUBMIT"/>
+    </div>
+{% endblock %}

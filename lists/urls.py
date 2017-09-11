@@ -24,4 +24,10 @@ from . import views
 urlpatterns = [
     url(r'^(\d+)/$', views.view_list, name='view_list'),
     url(r'^new$', views.new_list, name='new_list'),
+    # url(r'^user/', views.register, name='register'),
+    url(r'^login/', views.login, name='login'),
+    url(r'^register/', views.register_view, name='register_view'),
+    url(r'^hello/', views.hello, name='hello'),
+    url(r'^search_form/', views.search_form, name='search_form'),
+    url(r'^search/', views.search, name='search'),
 ]

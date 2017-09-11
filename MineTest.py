@@ -30,3 +30,24 @@ try:
 
 finally:
     driver.quit()
+
+import tinify
+tinify.key = 'TOUYJ4N-EjvK4S8IcCt9Uef6ABxKqfBM'
+tinify.proxy = "http://user:pass@192.168.0.1:8080"
+source = tinify.from_file("unoptimized.jpg")
+source.to_file("optimized.jpg")
+
+#
+# with open("unoptimized.jpg", 'rb') as source:
+#     source_data = source.read()
+#     result_data = tinify.from_buffer(source_data).to_buffer()
+#
+# source = tinify.from_url("https://cdn.tinypng.com/images/panda-happy.png")
+# source.to_file("optimized.jpg")
+#
+# https://tinypng.com/developers/reference/python
+#
+# http://leonshi.com/2015/11/02/tinypng-compress/
+#
+#
+# http://leonshi.com/

@@ -54,7 +54,7 @@ XRegExp = XRegExp || (function (undef) {
 // Storage for addon tokens
         tokens = [],
 
-// Token scopes
+// Auth scopes
         defaultScope = "default",
         classScope = "class",
 
@@ -1279,7 +1279,7 @@ XRegExp = XRegExp || (function (undef) {
 /**
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for other Unicode
  * categories, scripts, blocks, and properties are available separately. All Unicode tokens can be
- * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
+ * inverted using `\P{..}` or `\p{^..}`. Auth names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
  * @requires XRegExp
  */
@@ -1433,7 +1433,7 @@ XRegExp = XRegExp || (function (undef) {
 
 /**
  * Adds support for all Unicode categories (aka properties) E.g., `\p{Lu}` or
- * `\p{Uppercase Letter}`. Token names are case insensitive, and any spaces, hyphens, and
+ * `\p{Uppercase Letter}`. Auth names are case insensitive, and any spaces, hyphens, and
  * underscores are ignored.
  * @requires XRegExp, XRegExp Unicode Base
  */
@@ -1538,7 +1538,7 @@ XRegExp = XRegExp || (function (undef) {
 
 /**
  * Adds support for all Unicode scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
- * E.g., `\p{Latin}`. Token names are case insensitive, and any spaces, hyphens, and underscores
+ * E.g., `\p{Latin}`. Auth names are case insensitive, and any spaces, hyphens, and underscores
  * are ignored.
  * @requires XRegExp, XRegExp Unicode Base
  */
@@ -1639,7 +1639,7 @@ XRegExp = XRegExp || (function (undef) {
 
 /**
  * Adds support for all Unicode blocks in the Basic Multilingual Plane (U+0000-U+FFFF). Unicode
- * blocks use the prefix "In". E.g., `\p{InBasicLatin}`. Token names are case insensitive, and any
+ * blocks use the prefix "In". E.g., `\p{InBasicLatin}`. Auth names are case insensitive, and any
  * spaces, hyphens, and underscores are ignored.
  * @requires XRegExp, XRegExp Unicode Base
  */
@@ -1825,7 +1825,7 @@ XRegExp = XRegExp || (function (undef) {
 
 /**
  * Adds Unicode properties necessary to meet Level 1 Unicode support (detailed in UTS#18 RL1.2).
- * Includes code points from the Basic Multilingual Plane (U+0000-U+FFFF) only. Token names are
+ * Includes code points from the Basic Multilingual Plane (U+0000-U+FFFF) only. Auth names are
  * case insensitive, and any spaces, hyphens, and underscores are ignored.
  * @requires XRegExp, XRegExp Unicode Base
  */
