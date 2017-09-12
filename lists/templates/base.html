@@ -1,7 +1,9 @@
 <html>
 <head>
+    <meta charset="utf-8">
     <title>To-Do lists</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/static/base.css" rel="stylesheet" media="screen">
 </head>
@@ -9,27 +11,65 @@
 
 <body>
 <div class="container">
-    <div class="col-md-6 col-md-offset-3 jumbotron">
-        <div class="text-center">
-            <h1>{% block header_text %}{% endblock %}</h1>
-            <form method="POST" action="{% block form_action %}{% endblock %}">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Superlists</a>
+
+            {% if user.email %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="navbar-text">Logged in as {{ user.email }}</li>
+                    <li><a href="#">Log out</a> </li>
+                </ul>
+            {% else %}
+                <form class="navbar-form navbar-right"
+                  method="POST"
+                  action="{% url 'send_login_email' %}">
+                <span>Enter email to log in:</span>
+                <input class="form-control" name="email" type="text"/>
                 {% csrf_token %}
-{#                <input name="text" id="id_text" class="form-control input-lg" placeholder="Enter a to-do item"/>#}
-                {{ form.text }}
-                {% if form.errors %}
-                    <div class="form-group has-error">
-                        <span class="help-block">{{ form.text.errors }}</span>
-                    </div>
-                {% endif %}
             </form>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% if messages %}
+        <div class="row">
+            <div class="col-md-8">
+                {% for message in messages %}
+                    {% if message.level_tag == 'success' %}
+                        <div class="alert alert-success">{{ message }}</div>
+                    {% else %}
+                        <div class="alert alert-warning">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 jumbotron">
+            <div class="text-center">
+                <h1>{% block header_text %}{% endblock %}</h1>
+                <form method="POST" action="{% block form_action %}{% endblock %}">
+                    {% csrf_token %}
+                    {{ form.text }}
+                    {% if form.errors %}
+                        <div class="form-group has-error">
+                            <span class="help-block">{{ form.text.errors }}</span>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             {% block table %}
             {% endblock %}
         </div>
     </div>
+
 </div>
 <!-- 习惯于在 HTML body 末尾引入 script， 这样不必等到 script 加载完才显示内容，而且保证加载了大部分 DOM -->
 

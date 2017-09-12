@@ -39,6 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'lists',
+    'accounts',
+]
+
+# 自定义 User Model
+AUTH_USER_MODEL = 'accounts.User'
+# 自定义 User authentication backend
+AUTHENTICATION_BACKENDS = [
+    'accounts.authentication.PasswordlessAuthenticationBackend'
 ]
 
 MIDDLEWARE = [
@@ -122,3 +130,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))
 #把 static file 放在外部， 且不受版本控制
+
+#发送邮件配置
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_HOST_USER = '550906133@qq.com'
+EMAIL_HOST_PASSWORD = 'kekhkozpgsjrbcfc' # smtp 授权码
+EMAIL_PORT = 25
+EMAIL_USE_TLS = True
