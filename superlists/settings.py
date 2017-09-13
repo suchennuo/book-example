@@ -137,3 +137,20 @@ EMAIL_HOST_USER = '550906133@qq.com'
 EMAIL_HOST_PASSWORD = 'kekhkozpgsjrbcfc' # smtp 授权码
 EMAIL_PORT = 25
 EMAIL_USE_TLS = True
+#debug 配置信息
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+        },
+    },
+    'root': {'level': 'INFO'},
+}
