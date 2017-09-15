@@ -1,3 +1,4 @@
 selenium==3.5.0
 Django==1.10.4
 Fabric==1.14.0
+gunicorn==19.6.0

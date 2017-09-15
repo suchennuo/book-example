@@ -1,0 +1,12 @@
+[Unit]
+Description=Gunicorn server for superlists
+[Service]
+Restart=on-failure
+WorkingDirectory=/home/chao/sites/superlist/source
+User=chao
+ExecStart=/home/chao/sites/superlists/virtualenv/bin/gunicorn --bind \
+unix:/tmp/superlists.socket superlists.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+

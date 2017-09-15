@@ -17,10 +17,14 @@ sudo pip3 install virtualenv
 ## 配置 Nginx 虚拟机
 * 参考 nginx.template.conf
 * 把 SITENAME 替换成所需的域名，例如 yongchaozhang.com
+可惜我没有备案域名，只能在 server_name 写死了IP地址
 
 ## Upstart 任务
 * 参考 gunicorn-upstart.temlate.conf
 * 把 SITENAME 替换成所需要的域名
+
+## Systemd 任务
+* 参考 gunicorn-systemd.template.service
 
 ## 文件夹结构：
 假设有用户账户，home 目录为 home/username
