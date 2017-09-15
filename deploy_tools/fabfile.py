@@ -1,10 +1,11 @@
-from fabric.contrib.files import append, exists, sed
+from fabric.contrib.files import append, exists, sed, is_link
 from fabric.api import env, local, run
 import random
 
 REPO_URL = 'https://github.com/suchennuo/book-example.git'
 
 APP_NAME = 'superlists'
+env.user = 'chao'
 
 def deploy():
     # /home/chao/sites/superlists
@@ -13,12 +14,15 @@ def deploy():
     source_folder = site_folder + '/source'
 
     _create_directory_structure_if_necessary(site_folder)
-
     _get_latest_source(source_folder)
     _update_settings(source_folder, env.host)
-    _update_static_files(source_folder)
     _update_virtualenv(source_folder)
+    _update_static_files(source_folder)
     _update_database(source_folder)
+
+    _nginx_config(source_folder)
+    _nginx_create_symlink()
+    _gunicorn_config(source_folder)
 
 
 def _create_directory_structure_if_necessary(sit_folder):
@@ -54,6 +58,7 @@ def _update_settings(source_folder, site_name):
     append(setting_path, '\nfrom .secret_key import SECRET_KEY')
 
 def _update_virtualenv(source_folder):
+    # /home/chao/sites/superlists/source/../virtualenv
     virtualenv_folder = source_folder + '/../virtualenv'
     if not exists(virtualenv_folder + '/bin/pip3'):
         run(f'python3 -m venv {virtualenv_folder}')
@@ -68,3 +73,22 @@ def _update_database(source_folder):
     run(
         f'cd {source_folder} && ../virtualenv/bin/python3 manage.py migrate --noinput'
     )
+
+def _nginx_config(source_floder):
+    run(
+        f'cat {source_floder}/deploy_tools/nginx.template.conf  | sudo tee /etc/nginx/sites-available/superlists'
+    )
+def _nginx_create_symlink():
+    if not exists('/etc/nginx/sites-enabled/superlists'):
+        run(
+            'sudo ln -s /etc/nginx/sites-available/superlists /etc/nginx/sites-enabled/superlists'
+        )
+
+def _gunicorn_config(source_floder):
+    run(
+        f'cat {source_floder}/deploy_tools/gunicorn-systemd.template.service | sudo tee /etc/systemd/system/gunicorn-superlists.service'
+    )
+    run('sudo systemctl daemon-reload')
+    run('/etc/init.d/nginx start')
+    run('sudo systemctl enable gunicorn-superlists.service')
+    run('sudo systemctl start gunicorn-superlists.service')
