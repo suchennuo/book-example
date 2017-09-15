@@ -8,7 +8,7 @@ APP_NAME = 'superlists'
 
 def deploy():
     # /home/chao/sites/superlists
-    site_folder = '/home/%s/sites/%s' % (env.user, APP_NAME)
+    site_folder = f'/home/{env.user}/sites/{APP_NAME}'
     # /home/chao/sites/superlists/source
     source_folder = site_folder + '/source'
 
@@ -23,8 +23,7 @@ def deploy():
 
 def _create_directory_structure_if_necessary(sit_folder):
     for subfolder in ('database', 'static', 'virtualenv', 'source'):
-        run('mkdir -p %s/%s' % (sit_folder, subfolder))
-
+        run(f'mkdir -p {sit_folder}/{subfolder}')
 
 def _get_latest_source(source_folder):
     if exists(source_folder + '/.git'):
@@ -42,6 +41,11 @@ def _update_settings(source_folder, site_name):
         'ALLOWED_HOSTS = .+$',
         f'ALLOWED_HOSTS = ["{site_name}"]'
     )
+
+    '''
+    Django 用 SECRET_KEY 来做一些加密——比如 cookies 和 CSRF. 最佳实践是保持 server 上的
+    secret key 与 源码里的不同。
+    '''
     secret_key_file = source_folder + '/superlists/secret_key.py'
     if not exists(secret_key_file):
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
