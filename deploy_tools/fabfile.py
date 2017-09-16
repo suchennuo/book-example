@@ -89,6 +89,6 @@ def _gunicorn_config(source_floder):
         f'cat {source_floder}/deploy_tools/gunicorn-systemd.template.service | sudo tee /etc/systemd/system/gunicorn-superlists.service'
     )
     run('sudo systemctl daemon-reload')
-    run('/etc/init.d/nginx start')
+    run('/etc/init.d/nginx reload')
     run('sudo systemctl enable gunicorn-superlists.service')
     run('sudo systemctl start gunicorn-superlists.service')

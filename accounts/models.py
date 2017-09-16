@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 # Create your models here.
 # Django 自定义 User https://docs.djangoproject.com/en/1.11/topics/auth/customizing/
+from django.conf import settings
 
 from django.contrib import auth
 auth.signals.user_logged_in.disconnect(auth.models.update_last_login)
@@ -23,3 +24,4 @@ class User(models.Model):
 class Token(models.Model):
     email = models.EmailField()
     uid = models.CharField(default=uuid.uuid4, max_length=40)
+
