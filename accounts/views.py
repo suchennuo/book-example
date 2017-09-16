@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.contrib import messages, auth
 from accounts.models import Token
 from django.core.urlresolvers import reverse
+from django.core.mail import EmailMultiAlternatives
 import sys
 
 # Create your views here.
@@ -14,12 +15,19 @@ def send_login_email(request):
     url = request.build_absolute_uri(
         reverse('login') + '?token=' + str(token.uid)
     )
-    message_body = f'Use this link to log in:\n\n<a href="/" target="_blank">{url}</a>'
-    send_mail('Your login link for Superlists',
-              message_body,
-              '550906133@qq.com',
-              [email],
-              )
+    subject = 'Your login link for Superlists'
+    text_content = 'Use this link to log in:\n\n'
+    from_email = '550906133@qq.com'
+    html_content = f'<html><body><h3>Use this link to log in:</h3><br><br><a href="{url}">{url}</a></body></html>'
+    msg = EmailMultiAlternatives(
+        subject,
+        text_content,
+        from_email,
+        [email]
+    )
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
     messages.add_message(
         request,
         messages.SUCCESS,

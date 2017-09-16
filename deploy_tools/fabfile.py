@@ -7,6 +7,8 @@ REPO_URL = 'https://github.com/suchennuo/book-example.git'
 APP_NAME = 'superlists'
 env.user = 'chao'
 
+# fab deploy:host=chao@123.56.143.19
+
 def deploy():
     # /home/chao/sites/superlists
     site_folder = f'/home/{env.user}/sites/{APP_NAME}'
@@ -40,11 +42,14 @@ def _get_latest_source(source_folder):
 
 def _update_settings(source_folder, site_name):
     setting_path = source_folder + '/superlists/settings.py'
-    sed(setting_path, "DEBUG = True", "DEBUG = False")
-    sed(setting_path,
-        'ALLOWED_HOSTS = .+$',
-        f'ALLOWED_HOSTS = ["{site_name}"]'
-    )
+
+    # 个人网站 ，不需要这些了。调试起来不方便
+
+    # sed(setting_path, "DEBUG = True", "DEBUG = False")
+    # sed(setting_path,
+    #     'ALLOWED_HOSTS = .+$',
+    #     f'ALLOWED_HOSTS = ["{site_name}"]'
+    # )
 
     '''
     Django 用 SECRET_KEY 来做一些加密——比如 cookies 和 CSRF. 最佳实践是保持 server 上的
