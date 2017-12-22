@@ -5,7 +5,11 @@ Restart=on-failure
 WorkingDirectory=/home/chao/sites/superlists/source
 User=chao
 ExecStart=/home/chao/sites/superlists/virtualenv/bin/gunicorn --bind \
-unix:/tmp/superlists.socket superlists.wsgi:application
+unix:/tmp/superlists.socket \
+--capture-output \
+--access-logfile ../access.log \
+--error-logfile ../error.log \
+superlists.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
