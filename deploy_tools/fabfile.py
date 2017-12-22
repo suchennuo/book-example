@@ -50,9 +50,10 @@ def _update_settings(source_folder, site_name):
 
     # .+$ 匹配除换行符 \n 之外的任何单字符。要匹配 . ，请使用 \. 。
     if "www" not in site_name:
-        set(setting_path,
+        sed(setting_path,
             'ALLOWED_HOSTS = .+$',
-            f'ALLOWD_HOSTS = ["{site_name}", "www.{site_name}"]')
+            f'ALLOWED_HOSTS = ["{site_name}", "{"www."+site_name}"]'
+            )
     else:
         sed(setting_path,
             'ALLOWED_HOSTS = .+$',
