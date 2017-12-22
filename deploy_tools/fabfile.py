@@ -25,6 +25,7 @@ def deploy():
     _nginx_config(source_folder)
     _nginx_create_symlink()
     _gunicorn_config(source_folder)
+    _upstart_config(source_folder)
 
 
 def _create_directory_structure_if_necessary(sit_folder):
@@ -88,6 +89,11 @@ def _nginx_create_symlink():
         run(
             'sudo ln -s /etc/nginx/sites-available/superlists /etc/nginx/sites-enabled/superlists'
         )
+def _upstart_config(source_folder):
+    if not exists('/etc/init/gunicorn-superlists.conf'):
+        run(
+            f'cat {source_folder}/deploy_tools/gunicorn-upstart.template.conf | sudo tee /etc/init/gunicorn-superlists.conf'
+        )
 
 def _gunicorn_config(source_floder):
     run(
@@ -97,3 +103,4 @@ def _gunicorn_config(source_floder):
     run('/etc/init.d/nginx reload')
     run('sudo systemctl enable gunicorn-superlists.service')
     run('sudo systemctl start gunicorn-superlists.service')
+    run('sudo systemctl restart gunicorn-superlists.service')
