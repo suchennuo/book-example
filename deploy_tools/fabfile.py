@@ -49,16 +49,16 @@ def _update_settings(source_folder, site_name):
     sed(setting_path, "DEBUG = True", "DEBUG = True")
 
     # .+$ 匹配除换行符 \n 之外的任何单字符。要匹配 . ，请使用 \. 。
-    if "www" not in site_name:
-        sed(setting_path,
-            'ALLOWED_HOSTS = .+$',
-            f'ALLOWED_HOSTS = ["{site_name}", "{"www."+site_name}"]'
-            )
-    else:
-        sed(setting_path,
-            'ALLOWED_HOSTS = .+$',
-            f'ALLOWED_HOSTS = ["{site_name}", "{site_name[site_name.find("www.")+4:]}"]'
-        )
+    # if "www" not in site_name:
+    #     sed(setting_path,
+    #         'ALLOWED_HOSTS = .+$',
+    #         f'ALLOWED_HOSTS = ["{site_name}", "{"www."+site_name}"]'
+    #         )
+    # else:
+    #     sed(setting_path,
+    #         'ALLOWED_HOSTS = .+$',
+    #         f'ALLOWED_HOSTS = ["{site_name}", "{site_name[site_name.find("www.")+4:]}"]'
+    #     )
 
     '''
     Django 用 SECRET_KEY 来做一些加密——比如 cookies 和 CSRF. 最佳实践是保持 server 上的

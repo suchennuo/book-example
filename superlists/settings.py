@@ -26,7 +26,11 @@ SECRET_KEY = 'jd+!4wzskaqa+ozasn=lrmv@ax+s63u81=_$f(lcpw%(5*q07t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['123.56.143.19', 'localhost']
+ALLOWED_HOSTS = ['123.56.143.19', 'localhost', '5f1980b8.ngrok.io',
+                 'slightsnow.com'
+                 'www.slightsnow.com'
+                 'slightsnow.com/openwx/',
+                 'www.slightsnow.com/openwx/']
 
 
 # Application definition
