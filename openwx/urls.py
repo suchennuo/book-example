@@ -1,7 +1,7 @@
 
 from django.conf.urls import url
 
-from . import views
+from openwx import views
 
 # app_name = 'lists'
 urlpatterns = [
