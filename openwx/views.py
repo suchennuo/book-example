@@ -24,30 +24,31 @@ robot.config["APP_ID"] = "wx1a96816e77bd8971"  # "wxc05433d37133e7bb"
 robot.config["APP_SECRET"] = "965ca48d1f4d9a1a7005230bd97c1ac0"  # "5bfa787f37541860d6f2c2f1d83b5ca2"
 robot.config["TOKEN"] = "tokenhere"
 
-client = robot.client
+# client = robot.client
+#
+# client.create_menu({
+#     "button":[{
+#         "type": "click",
+#         "name": "取你🐶命",
+#         "key": "funny"
+#     }]
+# })
 
-client.create_menu({
-    "button":[{
-        "type": "click",
-        "name": "取你🐶命",
-        "key": "funny"
-    }]
-})
 
-
-@robot.key_click("funny")
-def funny(message):
-    return "It's not funny."
+# @robot.key_click("funny")
+# def funny(message):
+#     return "It's not funny."
 
 
 @robot.handler
 def hello(message, session):
-    json = client.get_user_info(user_id=message.source)
-    nickname = json['nickname']
+
+    # json = client.get_user_info(user_id=message.source)
+    # nickname = json['nickname']
 
     count = session.get("count", 0)+1
     session["count"] = count
-    return "Hi, {}. You have sent {} messages to me.".format(nickname, count)
+    return "Hi, stranger. You have sent {} messages to me.".format( count)
 
 
 @csrf_exempt
