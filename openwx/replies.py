@@ -7,9 +7,32 @@ from openwx.utils import to_text, is_string
 TAG = "replies.py"
 
 
+def renderable_named_tuple(typename, field_names, template):
+    class TMP(namedtuple(typename=typename, field_names=field_names)):
+        __TEMPLATE__ = template
+
+        @property
+        def args(self):
+            return dict(zip(self._fields, self))
+
+        def process_args(self, **kwargs):
+            args = defaultdict(str)
+            for k, v in kwargs.items():
+                if is_string(v):
+                    v = to_text(v)
+                args[k] = v
+            return args
+
+        def render(self):
+            return to_text(self.__TEMPLATE__.format(**self.process_args(self.args)))
+
+    TMP.__name__ = typename
+    return TMP
+
+
 class WeChatReply(object):
 
-    def process_agrs(self):
+    def process_args(self, args):
         pass
 
     def __init__(self, message=None, **kwargs):
@@ -25,22 +48,22 @@ class WeChatReply(object):
             kwargs["time"] = int(time.time())
 
         # if 'content' not in kwargs:
-        kwargs["content"] = "Hello, stranger."
+        # kwargs["content"] = "Hello, stranger."
 
         args = defaultdict(str)
         for k, v in kwargs.items():
             if is_string(v):
                 v = to_text(v)
             args[k] = v
-        # self.process_args(args)
+        self.process_args(args)
         self._args = args
 
     def render(self):
         return to_text(self.TEMPLATE.format(**self._args))
 
-    # def __getattr__(self, item):
-    #     if item in self._args:
-    #         return self._args[item]
+    def __getattr__(self, item):
+        if item in self._args:
+            return self._args[item]
 
 
 class TextReply(WeChatReply):
@@ -64,5 +87,5 @@ class SuccessReply(object):
 
 def process_function_reply(reply, message=None):
     if is_string(reply):
-        print(TAG + " source " + message.source)
+        print(TAG + " source " + message.source + " reply " + reply)
         return TextReply(message=message, content=reply)

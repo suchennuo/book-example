@@ -39,6 +39,8 @@ m_dic={'a':8, 'b':9}
 exec("print(a, b)", m_dic)
 
 """
+
+
 class ConfigAttribute(object):
     """
     让一个属性指向一个配置

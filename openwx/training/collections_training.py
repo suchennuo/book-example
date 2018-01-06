@@ -48,10 +48,58 @@ def orderedDict_training():
         print(k, v)
 
 
+"""
+关于字典的操作（创建 dict , 字典推导，设置默认值，pop方法, ）
+http://blog.csdn.net/yelyyely/article/details/40404217
+
+http://www.revotu.com/difference-dict-keys-values-items-between-python2-and-python3.html
+"""
+def opration_dict():
+    # 参数赋值
+    d = dict(a=1, b=2)
+    print(d)
+    # 可用迭代对象为参数且每一个迭代对象为（k, v) 对
+    l1 = ['a', 'b', 'c']
+    l2 = [1, 2, 3]
+    # zip(l1, l2) = [('a', 1), ('b', 2)]
+    d2 = dict(zip(l1, l2))
+    print(d2)
+    # 字典推导
+    d3 = { c:ord(c) for c in 'abc'}
+    print(d3)
+    # 设置默认值
+    l = ['a', 'b', 'c']
+    d4 = {}
+    print(d4.fromkeys(l, 0))
+    # 使用 defaultdict
+    from collections import defaultdict
+    s = "hello, world."
+    d5 = defaultdict(int)
+    for c in s: d5[c] += 1
+    print(d5)
+    # 使用setdefault 同时设置默认值和取值
+    d6 = {}
+    for c in s: d6[c] = d6.setdefault(c, 0) + 1
+    print(d6)
+    # pop 取出并删除
+    d6['is_mine'] = True
+    if (d6.pop('is_mine', False)):
+        print("is mine")
+    else:
+        print("is not mine")
+    # 遍历 。 keys values, items, python3 中相当于 python2 中的 view 系列方法
+    keys = d6.keys()
+    print(keys)
+    print(d6.values())
+    print(d6.items())
+    del d6['h']
+    print(d6)
 
 
 if __name__ == '__main__':
     namedtuple_training()
     print()
     orderedDict_training()
+    opration_dict()
+
 

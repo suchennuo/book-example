@@ -56,6 +56,15 @@ def check_token(token):
 def is_string(value):
     return isinstance(value, string_types)
 
+
+def json_loads(s):
+    s = to_text(s)
+    return json.loads(s)
+
+
+def json_dumps(d):
+    return json.dumps(d)
+
 """
 format 通过{} 和 : 来代替 %
 
@@ -88,6 +97,21 @@ def cached_property(method):
     return property(wrapped_func)  # 返回属性值, 只读
     # 为毛不直接返回 wrapped_func
 
+def generate_token(length=''):
+    if not length:
+        length = random.randint(3, 32)
+    length = int(length)
+    assert 3 <= length <= 32
+    letters = string.ascii_letters + string.digits
+    return ''.join(choice(letters) for _ in range(length))
 
 
+def make_error_page(url):
+    with io.open(
+        os.path.join(os.path.dirname(__file__), 'contrib/error.html'), 'r', encoding='utf-8'
+    ) as error_page:
+        return error_page.read().replace('{url}', url)
 
+
+def is_regex(value):
+    return isinstance(value, re_type)

@@ -1,6 +1,7 @@
 
 import xmltodict
 from openwx.messages.messages import MessageMetaClass, UnknownMessage
+from openwx.messages.events import EventMetalClass, UnknownEvent
 """
 <xml>
 <ToUserName>< ![CDATA[toUser] ]></ToUserName>
@@ -20,6 +21,8 @@ def process_message(message):
     message["type"] = message.pop("MsgType").lower()
     if message["type"] == 'event':
         #TODO: 事件的处理，订阅，取消订阅等
+        message["type"] = str(message.pop("Event")).lower() + '_event'
+        message_type = EventMetalClass.TYPES.get(message["type"], UnknownEvent)
         pass
     else:
         # Python 字典(Dictionary) get() 函数返回指定键的值，如果值不在字典中返回默认值。

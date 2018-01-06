@@ -7,8 +7,10 @@ from openwx.config import ConfigAttribute, Config
 from openwx.replies import process_function_reply
 from openwx.client import Client
 from openwx.exceptions import ConfigError
+from openwx.session.sqlitestorage import SQLiteStorage
 from openwx.utils import (
-    to_binary, to_text, cached_property,
+    to_binary, to_text, cached_property, check_signature,
+    is_regex
 )
 
 from inspect import signature
@@ -29,7 +31,8 @@ _DEFAULT_CONFIG = dict(
     TOKEN=None,
     APP_ID=None,
     APP_SPECRET=None,
-    ENCODING_AES_KEY=None
+    ENCODING_AES_KEY=None,
+    SESSION_STORAGE=None
 )
 
 __all__ = ['BaseRoBot', 'WeRoBot']
@@ -51,14 +54,18 @@ __all__ = ['BaseRoBot', 'WeRoBot']
 
 class BaseRobot(object):
 
-    message_types = ['text', 'image', 'unknown']
+    message_types = ['subscribe_event', 'unsubscribe_event','unknown_event', 'click_event',
+                     'text', 'image', 'unknown']
     token = ConfigAttribute("TOKEN")
+    session_storage = ConfigAttribute("SESSION_STORAGE")
 
     def __init__(self, token=None, app_id=None, app_secret=None, encoding_aes_key=None,
-                 config=None, **kwargs):
-        # 函数注解
-        # 验证函数参数是否合法
+                 config=None, session_storage=None, **kwargs):
+
+        # 字典推导式生成字典
+        # 类比 列表 推导式e.g: variable = [out_exp for out_exp in input_list if out_exp == 2]
         self._handlers = {k: [] for k in self.message_types}
+        # 添加。等级与 self._handlers.update(all=[])
         self._handlers['all'] = []
 
         if config is None:
@@ -69,11 +76,16 @@ class BaseRobot(object):
                 APP_ID=app_id,
                 APP_SECRET=app_secret,
                 ENCODING_AES_KEY=encoding_aes_key,
-                SESSION_STORAGE=None
             )
 
             for k, v in kwargs.items():#获取函数参数注解
                 self.config[k.upper()] = v
+
+            # set SESSION_STORAGE to False if you want to disable session.
+            # if session_storage:
+            #     self.config["SEESION_STORAGE"] = session_storage
+
+            self.config["SESSION_STORAGE"] = SQLiteStorage()
 
         else:
             self.config = config
@@ -108,8 +120,37 @@ class BaseRobot(object):
     def session_storage(self):
         if self.config["SESSION_STORAGE"] is False:
             return None
+        if not self.config["SESSION_STORAGE"]:
+            from .session.sqlitestorage import SQLiteStorage
+            self.config["SESSION_STORAGE"] = SQLiteStorage()
+        return self.config["SESSION_STORAGE"]
+
+    def click(self, f):
+        self.add_handler(f, type='click_event')
+        return f
+
+    def key_click(self, key):
+        """
+        自定义菜单 添加点击事件
+        :param key:
+        :return:
+        """
+        def wraps(func):
+            argc = len(signature(func).parameters.keys())
+
+            @self.click
+            def on_click(message, session=None):
+                if message.key == key:
+                    return func(*[message, session][:argc])
+            return func
+        return wraps
 
     def handler(self, f):
+        """
+        为每一条消息或事件添加一个 handler 方法的装饰器
+        :param f:
+        :return:
+        """
         self.add_handler(f, type='all')
         return f
 
@@ -120,6 +161,31 @@ class BaseRobot(object):
         :return:
         """
         self.add_handler(f, type='text')
+        return f
+
+    def image(self, f):
+        """
+        为图像添加一个 handler 方法的装饰器
+        :param f:
+        :return:
+        """
+        self.add_handler(f, type='image')
+        return f
+
+    def unknown(self, f):
+        self.add_handler(f, type='unknown')
+        return f
+
+    def subscribe(self, f):
+        self.add_handler(f, type='subscribe_event')
+        return f
+
+    def unsubscribe(self, f):
+        self.add_handler(f, type='unsubscribe_event')
+        return f
+
+    def unknown_event(self, f):
+        self.add_handler(f, type='unknown_event')
         return f
 
     def add_handler(self, func, type='all'):
@@ -135,8 +201,50 @@ class BaseRobot(object):
 
         self._handlers[type].append((func, len(signature(func).parameters.keys())))
 
+        # self._handlers
+        #e.g: {'text': [(<function add at 0x106e18f28>, 2)], 'image': [], 'unknow': [], 'all': [], 'link': []}
+
     def get_handlers(self, type):
         return self._handlers.get(type, []) + self._handlers['all']
+
+    def add_filter(self, func, rules):
+        """
+        为 BaseRobot 添加一个 filter handler
+        :param func: 如果 rules 通过，则处理该消息的 handler
+        :param rules: 一个 list, 包含要匹配的字符串或者正则表达式
+        :return:
+        """
+        if not callable(func):
+            raise ValueError("{} is not callable".format(func))
+        if not isinstance(rules, list):
+            raise ValueError("{} is not list".format(rules))
+
+        if len(rules) > 1:
+            for x in rules:
+                self.add_filter(func, [x])
+        else:
+            target_content = rules[0]
+            # 根据判断条件定义 _check_content()
+
+            if isinstance(target_content, six.string_types):
+                target_content = to_text(target_content)
+
+                def _check_content(message):
+                    return message.content == target_content
+            elif is_regex(target_content):
+                def _check_content(message):
+                    return target_content.match(message.content)
+            else:
+                raise TypeError(
+                    "{} is not a valid rule.".format(target_content)
+                )
+            argc = len(signature(func).parameters.keys())
+
+            @self.text
+            def _f(message, session=None):
+                if _check_content(message): # 调用合适的 _check_content
+                    return func(*[message, session][:argc])
+
 
     def parse_message(self, body, timestamp=None, nonce=None, msg_signature=None):
         """
@@ -152,6 +260,19 @@ class BaseRobot(object):
             pass;
         return process_message(message_dic)
 
+
+    """
+
+    正常情况下：
+    @robot.handler
+    def hello(message):
+        return 'hello world.'
+    会调用 add_handler 影响 self._handlers[type].append((func, len(signature(func).parameters.keys())))
+    get_reply 方法中，调用 get_handlers , 影响 self._handlers.get(type, []) + self._handlers['all']
+    然后 reply = handler(*args) = func(*args) = hello(message)
+    arg = [message, session][:args_count] , args_count = len(signature(func).parameters.keys()), == 1 or 2
+    最后 process_function_reply("hello wold", message=message)
+    """
     def get_reply(self, message):
 
         """
@@ -167,22 +288,25 @@ class BaseRobot(object):
         if session_storage and hasattr(message, "source"):
             id = to_binary(message.source)
             session = session_storage[id]
+            print("session {} ".format(session))
+
         print("message type " + message.type)
         handlers = self.get_handlers(message.type)
         # print(*handlers, sep='\n')  # nothing
         print("message source " + message.source)
-        return process_function_reply('text', message=message)
+        # return process_function_reply(reply, message=message)
 
-        # try:
-        #     for handler, args_count in handlers:
-        #         args = [message, session][:args_count]
-        #         reply = handler(*args)
-        #         if session_storage and id:
-        #             session_storage[id] = session
-        #         if reply:
-        #             return process_function_reply(reply, message=message)
-        # except:
-        #     print("Catch an exception")
+        try:
+            for handler, args_count in handlers:
+                args = [message, session][:args_count]
+                reply = handler(*args)
+                print("reply " + reply)
+                if session_storage and id:
+                    session_storage[id] = session
+                if reply:
+                    return process_function_reply(reply, message=message)
+        except:
+            print("Catch an exception")
 
     def get_encrypted_reply(self, message):
         """
@@ -202,6 +326,24 @@ class BaseRobot(object):
             print(reply.render())
             return reply.render()
 
+    def check_signature(self, timestamp, nonce, signature):
+        return check_signature(
+            self.config["TOKEN"], timestamp, nonce, signature
+        )
 
+    def error_page(self, f):
+        """
+        为 robot 指定 signature验证不通过时显示的错误页面
+        usage:
+            @robot.error_page
+            def make_error_page(url):
+                return "<h1>喵喵喵 %s 不是给麻瓜访问的，快奏凯</h1>" % url
+        :param f:
+        :return:
+        """
+        self.make_error_page = f
+        return f
+
+#TODO: 配置 WSGI
 class WeChatRobot(BaseRobot):
     pass

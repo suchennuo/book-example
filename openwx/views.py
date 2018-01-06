@@ -12,9 +12,43 @@ from django.utils.encoding import smart_str
 import xml.etree.ElementTree as etree
 
 
+
 logger = logging.getLogger(__name__)
 
 # Django 开发 需要注意 csrf_token
+
+# robot = WeChatRobot(token=utils.generate_token())
+robot = WeChatRobot()
+
+robot.config["APP_ID"] = "wx1a96816e77bd8971"  # "wxc05433d37133e7bb"
+robot.config["APP_SECRET"] = "965ca48d1f4d9a1a7005230bd97c1ac0"  # "5bfa787f37541860d6f2c2f1d83b5ca2"
+robot.config["TOKEN"] = "tokenhere"
+
+client = robot.client
+
+client.create_menu({
+    "button":[{
+        "type": "click",
+        "name": "取你🐶命",
+        "key": "funny"
+    }]
+})
+
+
+@robot.key_click("funny")
+def funny(message):
+    return "It's not funny."
+
+
+@robot.handler
+def hello(message, session):
+    json = client.get_user_info(user_id=message.source)
+    nickname = json['nickname']
+
+    count = session.get("count", 0)+1
+    session["count"] = count
+    return "Hi, {}. You have sent {} messages to me.".format(nickname, count)
+
 
 @csrf_exempt
 def access_token(request):
@@ -30,7 +64,7 @@ def access_token(request):
         token="tokenhere",
         timestamp=timestamp,
         nonce=nonce,
-        signature=signature
+        signature=signature,
     ):
         return HttpResponseForbidden()
 
@@ -42,7 +76,6 @@ def access_token(request):
         # print("Response " + othercontent)
         # return HttpResponse(othercontent)
 
-        robot = WeChatRobot()
         message = robot.parse_message(
             request.body,
             timestamp=timestamp,

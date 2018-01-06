@@ -18,10 +18,14 @@ def check_error(json):
     return json
 
 class Client(object):
+    """
+    微信 API 操作类
+    主动发信息，创建自定义菜单等
+    """
 
     def __init__(self, config):
         self.config = config
-        self.token = None
+        self._token = None
         self.token_expires_at = None
 
     @property
@@ -32,6 +36,9 @@ class Client(object):
     def appsecret(self):
         return self.config.get("APP_SECRET", None)
 
+    @property
+    def token(self):
+        return self.get_access_token()
 
 
     def request(self, method, url, **kwargs):
@@ -51,6 +58,7 @@ class Client(object):
         r.raise_for_status()  # 检查请求是否成功
         r.encoding = "utf-8"
         json = r.json()
+        print("response json {}".format(json))
         if check_error(json):
             return json
 
@@ -73,7 +81,7 @@ class Client(object):
         获取 access token
         :return:
         """
-
+        print("grant_token {} {} ".format(self.appid, self.appsecret))
         return self.get(
             url="https://api.weixin.qq.com/cgi-bin/token",
             params={
@@ -92,6 +100,7 @@ class Client(object):
 
         if self._token:
             now = time.time()
+            print("token expires {}".format(self.token_expires_at))
             if self.token_expires_at - now > 60:
                 return self._token
         json = self.grant_token()
@@ -112,6 +121,63 @@ class Client(object):
                 "touser": user_id,
                 "msgtype": "text",
                 "text": {"content": content}
+            }
+        )
+
+    def send_image_message(self, user_id, media_id):
+        """
+        发送图片消息
+        :param user_id:
+        :param media_id:
+        :return:
+        """
+        return self.post(
+            url="https://api.weixin.qq.com/cgi-bin/message/custom/send",
+            data={
+                "touser":user_id,
+                "msgtype":"image",
+                "image":{
+                    "media_id":media_id
+                }
+            }
+        )
+
+    def get_user_info(self, user_id, lang='zh_CN'):
+        """
+        获取用户基本信息
+        :param user_id:
+        :param lang:
+        :return:
+        """
+        return self.get(
+            url="https://api.weixin.qq.com/cgi-bin/user/info",
+            params={
+                "access_token": self.token,
+                "openid": user_id,
+                "lang": lang
+            }
+        )
+
+
+    def create_menu(self, menu_data):
+
+        """
+
+        :param menu_data: python 字典
+        :return:
+        """
+
+        return self.post(
+            url="https://api.weixin.qq.com/cgi-bin/menu/create",
+            data=menu_data
+        )
+
+    def create_custom_menu(self, menu_data, matchrule):
+        return self.post(
+            url="http://api.weixin.qq.com/cgi-bin/menu/addconditional",
+            data={
+                "button": menu_data,
+                "matchrule": matchrule
             }
         )
 
