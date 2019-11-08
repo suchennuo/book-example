@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['123.56.143.19', 'localhost', '5f1980b8.ngrok.io',
                  'slightsnow.com',
                  'www.slightsnow.com',
                  'slightsnow.com/openwx/',
+                 'image.slightsnow.com',
                  'www.slightsnow.com/openwx/']
 
 
